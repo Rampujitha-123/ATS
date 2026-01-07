@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalentPulse ATS | AI-Powered Career Tracking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --brand-primary: #6366f1;
+            --brand-secondary: #d946ef;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-vibrant {
+            background: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+            box-shadow: 0 10px 25px -5px rgba(99, 102, 241, 0.4);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-vibrant:hover:not(:disabled) {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 35px -8px rgba(217, 70, 239, 0.5);
+        }
+
+        .btn-vibrant:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 1);
+            box-shadow: 0 15px 45px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .sidebar-link.active {
+            color: var(--brand-primary);
+            background: #f5f3ff;
+            border-radius: 12px;
+        }
+
+        .progress-ring {
+            transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        /* Spinner */
+        .loader-dots div {
+            animation: bounce 0.5s ease-in-out infinite alternate;
+        }
+        .loader-dots div:nth-child(2) { animation-delay: 0.1s; }
+        .loader-dots div:nth-child(3) { animation-delay: 0.2s; }
+
+        @keyframes bounce {
+            to { transform: translateY(-10px); opacity: 0.5; }
+        }
+
+        /* Decorative Background */
+        .bg-glow {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, rgba(217, 70, 239, 0.03) 100%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="flex bg-slate-50/30">
+
+    <div class="bg-glow top-[-200px] left-[-200px]"></div>
+    <div class="bg-glow bottom-[-200px] right-[-200px]"></div>
+
+    <!-- Sidebar -->
+    <aside class="w-72 bg-white border-r border-slate-100 hidden lg:flex flex-col p-8 sticky top-0 h-screen z-30">
+        <div class="mb-10">
+            <h1 class="text-3xl font-extrabold gradient-text tracking-tighter flex items-center gap-2">
+                <i class="fas fa-bolt-lightning"></i> TalentPulse
+            </h1>
+        </div>
+        
+        <nav class="flex-1 space-y-2">
+            <button onclick="switchTab('dashboard')" class="sidebar-link active w-full flex items-center px-4 py-3 text-slate-500 font-bold transition-all">
+                <i class="fas fa-layer-group w-8"></i> Dashboard
+            </button>
+            <button onclick="switchTab('analyzer')" class="sidebar-link w-full flex items-center px-4 py-3 text-slate-500 font-bold transition-all">
+                <i class="fas fa-magnifying-glass-sparkles w-8"></i> Resume AI
+            </button>
+        </nav>
+
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl p-5 text-white shadow-xl shadow-indigo-100">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-shield-halved text-xs"></i>
+                </div>
+                <span class="text-xs font-bold uppercase tracking-widest">Premium Active</span>
+            </div>
+            <p class="text-[10px] leading-tight opacity-80">Your profile is currently optimized for maximum visibility.</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 min-h-screen">
+        <header class="px-8 py-6 flex justify-between items-center bg-white/50 backdrop-blur-md sticky top-0 z-20 border-b border-slate-50">
+            <h2 id="view-title" class="text-2xl font-black text-slate-900">Dashboard</h2>
+            <div class="flex items-center gap-4">
+                <div class="px-4 py-2 bg-emerald-50 rounded-full border border-emerald-100 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                    <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">AI Engine Live</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="p-8 max-w-6xl mx-auto">
+            <!-- DASHBOARD TAB -->
+            <div id="tab-dashboard" class="tab-content space-y-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-8 rounded-3xl border-l-4 border-indigo-500">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Average Match</p>
+                        <h3 id="dash-score" class="text-4xl font-black text-slate-800">--%</h3>
+                    </div>
+                    <div class="glass-card p-8 rounded-3xl border-l-4 border-purple-500">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Scans Today</p>
+                        <h3 id="dash-scans" class="text-4xl font-black text-slate-800">0</h3>
+                    </div>
+                    <div class="glass-card p-8 rounded-3xl border-l-4 border-pink-500">
+                        <p class="text-slate-400 text-[10px] font-black uppercase tracking-widest mb-1">Status</p>
+                        <h3 class="text-2xl font-black text-emerald-500">Optimized</h3>
+                    </div>
+                </div>
+
+                <div class="glass-card p-12 rounded-[40px] text-center space-y-6">
+                    <div class="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto text-indigo-600 text-3xl">
+                        <i class="fas fa-file-circle-plus"></i>
+                    </div>
+                    <h4 class="text-3xl font-black text-slate-900">Ready for a new analysis?</h4>
+                    <p class="text-slate-500 max-w-md mx-auto">Upload your resume to see how well you match with your dream job description.</p>
+                    <button onclick="switchTab('analyzer')" class="btn-vibrant text-white px-10 py-4 rounded-2xl font-black shadow-xl">
+                        Open Resume AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- ANALYZER TAB -->
+            <div id="tab-analyzer" class="tab-content hidden space-y-8">
+                <div id="input-ui" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Column 1: JD -->
+                    <div class="space-y-4">
+                        <label class="px-2 text-sm font-black text-slate-400 uppercase tracking-widest">1. Job Description</label>
+                        <div class="glass-card p-2 rounded-[32px]">
+                            <textarea id="jd-input" rows="12" class="w-full p-6 rounded-[24px] border-none focus:ring-0 text-slate-700 bg-white/50" placeholder="Paste requirements here..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: File & Action -->
+                    <div class="space-y-6">
+                        <label class="px-2 text-sm font-black text-slate-400 uppercase tracking-widest">2. Resume Upload</label>
+                        <div onclick="document.getElementById('file-input').click()" class="h-64 border-4 border-dashed border-indigo-100 bg-white/50 rounded-[32px] flex flex-col items-center justify-center cursor-pointer hover:border-indigo-400 transition-all group">
+                            <input type="file" id="file-input" class="hidden" accept=".pdf">
+                            <div class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center text-indigo-500 mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fas fa-upload text-2xl"></i>
+                            </div>
+                            <span id="file-name" class="font-bold text-slate-800">Choose PDF Resume</span>
+                            <span class="text-xs text-slate-400 mt-1">Max file size: 5MB</span>
+                        </div>
+
+                        <button id="run-btn" class="btn-vibrant w-full py-6 rounded-[32px] text-white text-xl font-black flex items-center justify-center gap-3">
+                            <i class="fas fa-wand-magic-sparkles"></i> Analyze Resume
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loading-ui" class="hidden py-32 text-center glass-card rounded-[40px]">
+                    <div class="loader-dots flex justify-center gap-2 mb-8">
+                        <div class="w-4 h-4 bg-indigo-500 rounded-full"></div>
+                        <div class="w-4 h-4 bg-purple-500 rounded-full"></div>
+                        <div class="w-4 h-4 bg-pink-500 rounded-full"></div>
+                    </div>
+                    <h3 class="text-3xl font-black text-slate-900">AI is thinking...</h3>
+                    <p class="text-slate-400 font-bold uppercase tracking-widest text-xs mt-4">Cross-referencing 500+ data points</p>
+                </div>
+
+                <!-- Result State -->
+                <div id="result-ui" class="hidden space-y-8 animate-in slide-in-from-bottom-5 duration-700">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                        <!-- Score Display -->
+                        <div class="lg:col-span-4 lg:sticky lg:top-24 h-fit space-y-6">
+                            <div class="glass-card p-10 rounded-[40px] flex flex-col items-center justify-center text-center">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">Match Score</span>
+                                <div class="relative w-48 h-48">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <circle class="text-slate-100 stroke-current" stroke-width="8" fill="transparent" r="40" cx="50" cy="50"></circle>
+                                        <circle id="score-ring" class="text-indigo-600 progress-ring stroke-current" stroke-width="8" stroke-linecap="round" fill="transparent" r="40" cx="50" cy="50" style="stroke-dasharray: 251.2; stroke-dashoffset: 251.2;"></circle>
+                                    </svg>
+                                    <div class="absolute inset-0 flex items-center justify-center">
+                                        <span id="score-val" class="text-5xl font-black text-slate-900">0%</span>
+                                    </div>
+                                </div>
+                                <div id="score-badge" class="mt-8 px-6 py-2 bg-indigo-50 text-indigo-600 rounded-full font-black text-xs uppercase tracking-widest">Analyzing...</div>
+                            </div>
+                            
+                            <!-- Rating Breakdown -->
+                            <div class="glass-card p-8 rounded-[32px] space-y-4">
+                                <h5 class="text-xs font-black text-slate-400 uppercase tracking-widest">Core Ratings</h5>
+                                <div id="rating-breakdown" class="space-y-3">
+                                    <!-- Ratings inject here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Display -->
+                        <div class="lg:col-span-8 space-y-8">
+                            <div class="glass-card p-10 rounded-[40px]">
+                                <div class="flex items-center gap-3 mb-8">
+                                    <div class="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shadow-lg shadow-indigo-100">
+                                        <i class="fas fa-file-lines"></i>
+                                    </div>
+                                    <h4 class="font-black text-2xl text-slate-800 tracking-tight">Executive Summary</h4>
+                                </div>
+                                <div id="analysis-text" class="text-slate-600 leading-relaxed">
+                                    <!-- Summary injects here -->
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="glass-card p-8 rounded-[32px] border-t-4 border-emerald-500">
+                                    <h5 class="text-emerald-600 font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="fas fa-circle-check"></i> Advantages
+                                    </h5>
+                                    <ul id="advantages-list" class="space-y-3 text-sm text-slate-600">
+                                        <!-- Advantages inject here -->
+                                    </ul>
+                                </div>
+                                <div class="glass-card p-8 rounded-[32px] border-t-4 border-pink-500">
+                                    <h5 class="text-pink-600 font-black text-sm uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="fas fa-circle-xmark"></i> Disadvantages
+                                    </h5>
+                                    <ul id="disadvantages-list" class="space-y-3 text-sm text-slate-600">
+                                        <!-- Disadvantages inject here -->
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="glass-card p-8 rounded-[32px] bg-gradient-to-r from-indigo-50 to-purple-50 border-none">
+                                <h5 class="text-indigo-600 font-black text-sm uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <i class="fas fa-lightbulb"></i> Action Plan
+                                </h5>
+                                <p id="action-plan" class="text-slate-700 font-medium italic">
+                                    <!-- Plan injects here -->
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-center pb-12">
+                        <button onclick="resetAnalyzer()" class="px-10 py-4 bg-slate-900 text-white rounded-2xl font-black hover:bg-black transition-all flex items-center gap-2">
+                            <i class="fas fa-rotate-left"></i> Analyze New Role
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Notifications -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl opacity-0 translate-y-10 transition-all z-50 pointer-events-none font-bold">
+        <span id="toast-text"></span>
+    </div>
+
+    <script>
+        // State Management
+        let appState = {
+            totalScans: 0,
+            lastScore: 0
+        };
+
+        // DOM Elements
+        const elements = {
+            tabs: document.querySelectorAll('.tab-content'),
+            links: document.querySelectorAll('.sidebar-link'),
+            viewTitle: document.getElementById('view-title'),
+            fileInput: document.getElementById('file-input'),
+            fileName: document.getElementById('file-name'),
+            jdInput: document.getElementById('jd-input'),
+            runBtn: document.getElementById('run-btn'),
+            inputUi: document.getElementById('input-ui'),
+            loadingUi: document.getElementById('loading-ui'),
+            resultUi: document.getElementById('result-ui'),
+            scoreVal: document.getElementById('score-val'),
+            scoreRing: document.getElementById('score-ring'),
+            scoreBadge: document.getElementById('score-badge'),
+            analysisText: document.getElementById('analysis-text'),
+            ratingBreakdown: document.getElementById('rating-breakdown'),
+            advantagesList: document.getElementById('advantages-list'),
+            disadvantagesList: document.getElementById('disadvantages-list'),
+            actionPlan: document.getElementById('action-plan'),
+            dashScore: document.getElementById('dash-score'),
+            dashScans: document.getElementById('dash-scans'),
+            toast: document.getElementById('toast'),
+            toastText: document.getElementById('toast-text')
+        };
+
+        // Tab Switching
+        function switchTab(id) {
+            elements.tabs.forEach(t => t.classList.add('hidden'));
+            document.getElementById(`tab-${id}`).classList.remove('hidden');
+            elements.viewTitle.textContent = id.charAt(0).toUpperCase() + id.slice(1);
+            
+            elements.links.forEach(l => {
+                l.classList.toggle('active', l.getAttribute('onclick').includes(id));
+            });
+        }
+
+        // File Selection
+        elements.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                elements.fileName.textContent = file.name;
+                elements.fileName.classList.add('text-indigo-600');
+            }
+        });
+
+        // The Enhanced "Brain"
+        async function simulateAnalysis(jd, fileName) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const score = Math.floor(Math.random() * (95 - 45 + 1)) + 45;
+                    const ratings = [
+                        { label: 'Keyword Match', score: Math.min(100, score + 5) },
+                        { label: 'Formatting', score: 85 },
+                        { label: 'Role Relevance', score: Math.max(0, score - 10) }
+                    ];
+
+                    const advantages = [
+                        "Strong match for technical core competencies mentioned in the JD.",
+                        "Excellent use of action verbs in the professional experience section.",
+                        "Clear hierarchical structure making it highly readable for ATS parsers.",
+                        "Quantifiable achievements provided for the most recent role."
+                    ];
+
+                    const disadvantages = [
+                        "Missing specific certifications like 'AWS Certified Architect' which was a priority.",
+                        "Large gap in professional history (2021-2022) without context or description.",
+                        "Soft skills are listed but not demonstrated through project context.",
+                        "PDF version is older than standard; may contain hidden font artifacts."
+                    ];
+
+                    resolve({
+                        score: score,
+                        ratings: ratings,
+                        summary: `Based on the provided Job Description, your resume <strong>"${fileName}"</strong> ranks as a <strong>${score > 75 ? 'Top-Tier' : 'Competitive'}</strong> match. The analysis shows that your background in specific technical domains aligns well with the employer's needs, though there are critical keyword gaps that could lead to an automated rejection in high-volume hiring cycles.`,
+                        advantages: advantages,
+                        disadvantages: disadvantages,
+                        plan: "Focus on adding a 'Certifications' section and explicitly link your soft skills to the project outcomes listed in your 2023 experience. Mirror the specific naming conventions used in the JD for cloud tools."
+                    });
+                }, 2500);
+            });
+        }
+
+        // Analysis Execution
+        elements.runBtn.addEventListener('click', async () => {
+            const jd = elements.jdInput.value.trim();
+            const file = elements.fileInput.files[0];
+
+            if (!jd || !file) {
+                showToast("Missing Resume or Job Requirements!");
+                return;
+            }
+
+            elements.inputUi.classList.add('hidden');
+            elements.loadingUi.classList.remove('hidden');
+
+            const result = await simulateAnalysis(jd, file.name);
+
+            // Update State
+            appState.totalScans++;
+            appState.lastScore = result.score;
+            updateDashboard();
+
+            // Display Results
+            elements.loadingUi.classList.add('hidden');
+            elements.resultUi.classList.remove('hidden');
+            
+            // Set Text
+            elements.analysisText.innerHTML = result.summary;
+            elements.actionPlan.textContent = result.plan;
+            
+            // Set Lists
+            elements.advantagesList.innerHTML = result.advantages.map(adv => `<li class="flex gap-2"><span>•</span> ${adv}</li>`).join('');
+            elements.disadvantagesList.innerHTML = result.disadvantages.map(dis => `<li class="flex gap-2"><span>•</span> ${dis}</li>`).join('');
+            
+            // Set Ratings
+            elements.ratingBreakdown.innerHTML = result.ratings.map(r => `
+                <div class="space-y-1">
+                    <div class="flex justify-between text-[10px] font-bold">
+                        <span>${r.label}</span>
+                        <span>${r.score}%</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000" style="width: ${r.score}%"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            animateScore(result.score);
+        });
+
+        function updateDashboard() {
+            elements.dashScore.textContent = `${appState.lastScore}%`;
+            elements.dashScans.textContent = appState.totalScans;
+        }
+
+        function animateScore(target) {
+            let current = 0;
+            const circ = 2 * Math.PI * 40;
+            elements.scoreRing.style.strokeDasharray = circ;
+            
+            const step = () => {
+                if (current < target) {
+                    current++;
+                    elements.scoreVal.textContent = `${current}%`;
+                    elements.scoreRing.style.strokeDashoffset = circ - (current / 100) * circ;
+                    
+                    if (current > 80) {
+                        elements.scoreBadge.textContent = "Strong Match";
+                        elements.scoreBadge.className = "mt-8 px-6 py-2 bg-emerald-50 text-emerald-600 rounded-full font-black text-xs uppercase tracking-widest";
+                    } else if (current > 60) {
+                        elements.scoreBadge.textContent = "Potential Match";
+                        elements.scoreBadge.className = "mt-8 px-6 py-2 bg-indigo-50 text-indigo-600 rounded-full font-black text-xs uppercase tracking-widest";
+                    } else {
+                        elements.scoreBadge.textContent = "Optimization Needed";
+                        elements.scoreBadge.className = "mt-8 px-6 py-2 bg-pink-50 text-pink-600 rounded-full font-black text-xs uppercase tracking-widest";
+                    }
+                    
+                    requestAnimationFrame(step);
+                }
+            };
+            requestAnimationFrame(step);
+        }
+
+        function resetAnalyzer() {
+            elements.resultUi.classList.add('hidden');
+            elements.inputUi.classList.remove('hidden');
+            elements.jdInput.value = "";
+            elements.fileInput.value = "";
+            elements.fileName.textContent = "Choose PDF Resume";
+            elements.fileName.classList.remove('text-indigo-600');
+        }
+
+        function showToast(msg) {
+            elements.toastText.textContent = msg;
+            elements.toast.classList.remove('opacity-0', 'translate-y-10');
+            setTimeout(() => elements.toast.classList.add('opacity-0', 'translate-y-10'), 3000);
+        }
+    </script>
+</body>
+</html>
